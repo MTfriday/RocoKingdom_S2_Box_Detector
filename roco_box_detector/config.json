@@ -19,8 +19,8 @@
       "templates/box_anchor/anchor (15).png"
     ],
     "threshold": 0.85,
-    "scale_min": 0.9,
-    "scale_max": 1.25,
+    "scale_min": 0.8,
+    "scale_max": 1.15,
     "scale_steps": 5,
     "use_grayscale": true,
     "use_canny": false,
@@ -246,7 +246,7 @@
     "save_selected_frames": false
   },
   "overlay": {
-    "width": 680,
+    "width": 300,
     "height": 64,
     "position": "bottom",
     "normal_text": "● 运行中",
@@ -259,8 +259,8 @@
   },
   "result_text_overlay": {
     "enabled": true,
-    "x": 323,
-    "y": 9,
+    "x": 398,
+    "y": 650,
     "width": 835,
     "height": 277,
     "min_width": 220,
@@ -315,5 +315,5 @@
     "roi_fallback": "太快了没看清喵"
   },
   "startup_complete": true,
-  "capture_mode": "solo"
+  "capture_mode": "duo"
 }

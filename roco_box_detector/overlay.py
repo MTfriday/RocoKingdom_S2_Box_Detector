@@ -1068,6 +1068,16 @@ class ResultTextOverlay(QWidget):
             self._ss_img2.setPixmap(QPixmap.fromImage(qimg).scaled(
                 max_w, max_h, Qt.KeepAspectRatio, Qt.SmoothTransformation))
 
+    def set_preview_state(self, enabled: bool) -> None:
+        """Set preview toggle button state without emitting signals."""
+        self._status_preview_on = bool(enabled)
+        self._preview_btn.setText("🔍 预览" if self._status_preview_on else "◌ 预览")
+        self._preview_btn.setStyleSheet(
+            f"QPushButton {{ color: {'#66aaff' if self._status_preview_on else '#888'}; "
+            "background: transparent; border: none; font-size: 14px; padding: 2px 6px; }"
+            "QPushButton:hover { color: #fff; background: rgba(255,255,255,18); "
+            "border-radius: 4px; }")
+
     # ── public API ────────────────────────────────────────────────────
 
     def add_result(self, label: str) -> None:

@@ -32,6 +32,7 @@ class AppBridge(QObject):
     request_toggle_panel = pyqtSignal()
     request_toggle_lock = pyqtSignal()
     request_quit = pyqtSignal()
+    request_set_preview = pyqtSignal(bool)
 
 
 # ── App ──────────────────────────────────────────────────────────────
@@ -55,6 +56,7 @@ class App:
         self._bridge.request_toggle_lock.connect(
             lambda: self.result_text.toggle_mouse_lock())
         self._bridge.request_quit.connect(self._quit)
+        self._bridge.request_set_preview.connect(self._on_request_set_preview)
 
         # Debug box overlay (transparent boxes painted over game screen)
         self.debug_box_overlay = DebugBoxOverlay()
@@ -85,6 +87,7 @@ class App:
             cache=self.cache,
             debug_drawer=self.debug_drawer,
             on_result=lambda r: self._bridge.result_ready.emit(r),
+            on_preview_closed=lambda: self._bridge.request_set_preview.emit(False),
         )
 
         # Settings panel
@@ -226,6 +229,18 @@ class App:
         self.config["debug"]["show_preview_window"] = enabled
         self.detector.set_preview_enabled(enabled)
         print(f"[Preview] Debug window: {'ON' if enabled else 'OFF'}")
+
+    def _on_request_set_preview(self, enabled: bool) -> None:
+        """Handle preview state requests coming from background threads.
+
+        Update the UI button state without re-emitting the toggle signal,
+        then apply the same setting to detector/config via existing handler.
+        """
+        try:
+            self.result_text.set_preview_state(enabled)
+        except Exception:
+            pass
+        self._on_toggle_preview(enabled)
 
     def _on_toggle_debug_overlay(self, enabled: bool) -> None:
         print(f"[DebugOverlay] Toggle: {'ON' if enabled else 'OFF'}")

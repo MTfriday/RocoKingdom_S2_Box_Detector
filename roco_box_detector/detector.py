@@ -209,6 +209,7 @@ class CascadeDetector(threading.Thread):
         cache: TemplateCache,
         debug_drawer: DebugDrawer,
         on_result: Callable[[CascadeDetectionResult], None],
+        on_preview_closed: Optional[Callable[[], None]] = None,
     ):
         super().__init__(daemon=True)
 
@@ -216,6 +217,7 @@ class CascadeDetector(threading.Thread):
         self.cache = cache
         self.debug_drawer = debug_drawer
         self.on_result = on_result
+        self._on_preview_closed = on_preview_closed
 
         self.roi: Optional[Dict[str, int]] = None
         self._stop_event = threading.Event()
@@ -601,6 +603,23 @@ class CascadeDetector(threading.Thread):
             key = cv2.waitKey(1) & 0xFF
             if key == ord("q"):
                 self._show_preview = False
+            try:
+                vis = cv2.getWindowProperty("Roco Box Detector Debug", cv2.WND_PROP_VISIBLE)
+                if vis <= 0:
+                    self._show_preview = False
+                    self._preview_window_open = False
+                    try:
+                        cv2.destroyWindow("Roco Box Detector Debug")
+                    except Exception:
+                        pass
+                    # notify main thread that user closed preview window
+                    if getattr(self, "_on_preview_closed", None):
+                        try:
+                            self._on_preview_closed()
+                        except Exception:
+                            pass
+            except Exception:
+                pass
         except Exception:
             pass
 
